@@ -23,9 +23,10 @@ from datetime import datetime
 from marcjsonconverter.bibfield.bibfield import create_record
 
 class Converter:
-    def __init__(self, list_files, collection):
+    def __init__(self, list_files, collection, doi_filter):
         self.list_files = list_files
         self.collection = collection
+        self.doi_filter = doi_filter
         self.no_doi = 0
 
     @classmethod
@@ -232,10 +233,14 @@ class Converter:
                     if rec["record"][0]["json"]["doi"] in doi_list:
                         continue
                     doi_list.append(rec["record"][0]["json"]["doi"])
+                    if self.doi_filter:
+                        if (rec["record"][0]["json"]["doi"]).startswith(self.doi_filter):
+                            self.json_data.append(rec)
+                    else:
+                        self.json_data.append(rec)
                 else:
                     self.no_doi = self.no_doi + 1
                     self.rec_no_doi.append(rec["record"][0]["json"]["recid"])
-                self.json_data.append(rec)
         print("Found %d records without doi"%self.no_doi)
         print("They are: %s"%str(self.rec_no_doi))
         return self.json_data
