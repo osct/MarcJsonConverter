@@ -23,11 +23,12 @@ from datetime import datetime
 from marcjsonconverter.bibfield.bibfield import create_record
 
 class Converter:
-    def __init__(self, list_files, collection, doi_filter):
+    def __init__(self, list_files, collection, doi_filter, communities):
         self.list_files = list_files
         self.collection = collection
         self.doi_filter = doi_filter
         self.no_doi = 0
+        self.communities = communities
 
     @classmethod
     def marc_to_record(cls, blob):
@@ -139,9 +140,9 @@ class Converter:
                 "license"] = "Creative Commons CCZero"
         elif license == ("Check Publication"):
             record._dict["license"] = dict()
-            record._dict["license"]["identifier"] = "notspecified"
-            record._dict["license"]["url"] = ""
-            record._dict["license"]["license"] = "License Not Specified"
+            record._dict["license"]["identifier"] = "cc-by"
+            record._dict["license"]["url"] = "http://www.opendefinition.org/licenses/cc-by"
+            record._dict["license"]["license"] = "Creative Commons Attribution"
         else:
             print >> sys.stderr, "No recognised license %s for record %s\n"%(license, record._dict["recid"])
 
@@ -167,7 +168,10 @@ class Converter:
             # record._dict.pop("reference")
             pass
 
-
+        if self.communities:
+            record._dict["communities"] = [
+                x.strip() for x in self.communities.split(',')
+            ]
 
         if "bibdocs" in record._dict:
             record._dict.pop("bibdocs")

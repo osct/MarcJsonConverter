@@ -40,11 +40,12 @@ from marcjsonconverter.converter.converter import Converter
 
 def main():
     base_doi_filter = None
+    communities = ""
     input_folder = "."
     input_file = "*.json"
     output_file = "stdout"
     try:
-        opts, rem = getopt.gnu_getopt(sys.argv[1:], "f:i:o:d:", ["ffile=","ifile=","ofile=","doi="])
+        opts, rem = getopt.gnu_getopt(sys.argv[1:], "f:i:o:d:c:", ["ffile=", "ifile=", "ofile=", "doi=", "communities="])
     except getopt.GetoptError:
         print ("main.py -f <inputfolder> -i <inputfile> -o <outputfile> <collection>")
         sys.exit(2)
@@ -57,6 +58,8 @@ def main():
             output_file = arg
         if opt in ("-d", "--doi"):
             base_doi_filter = arg
+        if opt in ("-c", "--communities"):
+            communities = arg
 
     if not rem:
         sys.exit(3)
@@ -68,7 +71,7 @@ def main():
     if not list_file_records:
         print("No files to parse for records")
         sys.exit(2)
-    converter = Converter(list_file_records, rem[0], base_doi_filter)
+    converter = Converter(list_file_records, rem[0], base_doi_filter, communities)
     json_records = converter.record_with_json_field_from_marc()
     if output_file == "stdout":
         print(json_records)
